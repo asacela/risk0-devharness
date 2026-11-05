@@ -1,0 +1,42 @@
+# Scaffold repo: ALLOWLIST ONLY.
+# Everything is ignored by default (including worktrees/ and the contents of
+# repositories/, where every repo gets cloned). To track something, add an explicit `!` rule below.
+
+/*
+!/.gitignore
+!/AGENTS.md
+!/CLAUDE.md
+!/README.md
+
+# repositories: the shell is tracked, every repo cloned into it is ignored
+!/repositories/
+/repositories/*
+!/repositories/.gitkeep
+
+# workflow skills (symlinked into ~/.claude/skills) and the plugin dependency list
+!/.claude/
+/.claude/*
+!/.claude/skills/
+!/.claude/settings.json
+!/.claude/SKILLS.md
+
+# toolbox: rules + folder skeleton only, no journal/sandbox content
+!/toolbox/
+/toolbox/*
+!/toolbox/AGENTS.md
+!/toolbox/CLAUDE.md
+!/toolbox/journal/
+/toolbox/journal/*
+!/toolbox/journal/.gitkeep
+!/toolbox/sandbox/
+/toolbox/sandbox/*
+!/toolbox/sandbox/learning/
+/toolbox/sandbox/learning/*
+!/toolbox/sandbox/learning/.gitkeep
+!/toolbox/sandbox/plans/
+/toolbox/sandbox/plans/*
+!/toolbox/sandbox/plans/.gitkeep
+# helper scripts are tracked whole (they must hold no secrets)
+!/toolbox/scripts/
+
+.DS_Store
