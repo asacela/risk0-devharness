@@ -92,10 +92,10 @@ Cursor-only plugin (no Claude manifest), so skills are copied into `.claude/skil
 | `/implement` | Plan → code in a herdr worktree | subagent-driven-development, TDD |
 | `/test` | Run and add tests | TDD |
 | `/fix` | Root-cause a bug, regression test | systematic-debugging |
-| `/cr` | Review own diff, a PR, or PR comments | ponytail-review, receiving-code-review |
+| `/cr` | Review own diff, a PR, or PR comments | ponytail-review, thermo-nuclear-review, receiving-code-review |
 | `/push` | Ship through the gate | no-mistakes |
 | `/build` | All of the above end to end | everything |
-| `/setup`, `/understand`, `/steps`, `/log`, `/daily`, `/up`, `/legend` | Support commands | none |
+| `/setup`, `/understand`, `/steps`, `/log`, `/daily`, `/up`, `/setup-worktree`, `/groom`, `/legend`, `/context-manager` | Support commands | none |
 | `/fix-merge-conflicts`, `/verify-this`, `/weekly-review` | Copied from cursor-team-kit | none |
 | `/thermo-nuclear-review` | Copied from cursor-team-kit; risk gate before `/push` and in `/build` | none |
 | `/statechart`, `/unslop` | Copied from pstack; `/statechart` in `/planning`, `/unslop` on prose in `/push` and `/understand save` | none |

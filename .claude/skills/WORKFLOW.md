@@ -15,9 +15,9 @@ Each command skill reads this file first. It decides which installed tool does w
 | Bugs | `superpowers:systematic-debugging` | — | Root cause before fix. |
 | "It's done" | `superpowers:verification-before-completion` | — | Evidence before claims. |
 | Review, push, PR/MR, CI | no-mistakes (the push command) | `requesting-code-review`, `finishing-a-development-branch` | It reviews, tests, lints, opens the PR and babysits CI. |
-| Reviewing code by hand | `ponytail:ponytail-review` | `/code-review` (only to post inline PR comments: `--comment`) | Reads the connected code, plain-English findings. |
+| Reviewing code by hand | `ponytail:ponytail-review`, then `/thermo-nuclear-review` (both run by `/cr`) | `/code-review` (only to post inline PR comments: `--comment`) | Reads the connected code, plain-English findings, then a strict structural pass. |
 | Modelling states and transitions | `/statechart` (manual, asks first) | — | TLA+ model checker with a Mermaid chart; use in `/planning` for lifecycle tickets. |
-| Risky change, extra scrutiny | `/thermo-nuclear-review` (manual, asks first) | — | Harsh structural review before `/push`: migrations, auth, billing, public API contracts, oversized diffs. |
+| Risky change, extra scrutiny | `/thermo-nuclear-review` (always inside `/cr`; before `/push` it asks first) | — | Harsh structural review: migrations, auth, billing, public API contracts, oversized diffs. |
 | Cutting AI tells from prose | `/unslop` | — | Docs, READMEs, user-facing copy, saved learning notes. Prose only, never code. |
 | Feedback on my PR | `superpowers:receiving-code-review` | — | Verify each comment, no blind agreement. |
 | Output shape | tldr format, below | — | `/tldr` is user-only, so the shape is copied here. |

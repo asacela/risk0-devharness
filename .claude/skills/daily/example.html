@@ -1,0 +1,327 @@
+<title>Daily Update</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky control bar, greeting masthead with four vital-sign tiles, then collapsible digest sections. */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --surface-2: #eef1f6; --fg: #10131c; --muted: #596175; --line: #dfe3ec;
+  --accent: #0a7a74; --accent-bg: #d9f1ee; --spark: #0a7a74;
+  --good: #137a3c; --good-bg: #d8f3e1; --warn: #9a5a00; --warn-bg: #fdebc6; --bad: #b3261e; --bad-bg: #fde0dc; --info: #3451c7; --info-bg: #e2e8fd; --unk: #6b7385; --unk-bg: #e7eaf1;
+  --shadow: 0 1px 2px rgba(16,19,28,.06), 0 6px 18px rgba(16,19,28,.05);
+  --font-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1017; --surface: #161b25; --surface-2: #1d2331; --fg: #eaeef6; --muted: #98a2b8; --line: #272f41;
+    --accent: #4fd1c5; --accent-bg: #123532; --spark: #4fd1c5;
+    --good: #5fd18c; --good-bg: #14301f; --warn: #f4bf5e; --warn-bg: #35280d; --bad: #ff8c82; --bad-bg: #3b1916; --info: #9db0ff; --info-bg: #1b2447; --unk: #98a2b8; --unk-bg: #212838;
+    --shadow: 0 1px 2px rgba(0,0,0,.45); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1017; --surface: #161b25; --surface-2: #1d2331; --fg: #eaeef6; --muted: #98a2b8; --line: #272f41;
+  --accent: #4fd1c5; --accent-bg: #123532; --spark: #4fd1c5;
+  --good: #5fd18c; --good-bg: #14301f; --warn: #f4bf5e; --warn-bg: #35280d; --bad: #ff8c82; --bad-bg: #3b1916; --info: #9db0ff; --info-bg: #1b2447; --unk: #98a2b8; --unk-bg: #212838;
+  --shadow: 0 1px 2px rgba(0,0,0,.45); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-block: 0 90px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+code { font-family: var(--font-mono); font-size: .86em; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; }
+.wrap { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 26px; }
+/* control bar */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 15; background: var(--bg); padding-block: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-bottom: 1px solid var(--line); margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
+.bar .chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
+.chip, .btn { font: inherit; font-size: 13px; font-weight: 500; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 5px 13px; cursor: pointer; }
+.chip:hover, .btn:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.tools { display: flex; gap: 6px; flex-wrap: wrap; }
+/* masthead */
+.mast { display: flex; flex-direction: column; gap: 18px; padding-top: 6px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(34px, 7vw, 52px); line-height: 1.02; letter-spacing: -.035em; margin: 4px 0 8px; text-wrap: balance; }
+.verdict { font-size: 18px; line-height: 1.45; margin: 0; max-width: 60ch; }
+.verdict b { font-weight: 600; background: var(--accent-bg); padding: 0 6px; border-radius: 5px; }
+.vitals { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.vital { background: var(--surface); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; min-width: 0; border: 1px solid transparent; }
+.vital .lbl { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--unk); flex: none; }
+.good .dot { background: var(--good); box-shadow: 0 0 0 4px var(--good-bg); }
+.warn .dot { background: var(--warn); box-shadow: 0 0 0 4px var(--warn-bg); }
+.bad .dot { background: var(--bad); box-shadow: 0 0 0 4px var(--bad-bg); animation: pulse 1.8s ease-in-out infinite; }
+.unk .dot { background: var(--unk); box-shadow: 0 0 0 4px var(--unk-bg); }
+@keyframes pulse { 50% { box-shadow: 0 0 0 8px transparent; } }
+.vital b { font-family: var(--font-display); font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+.vital span.sm { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.counts { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: end; }
+.count { display: flex; flex-direction: column; }
+.count b { font-family: var(--font-display); font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.count span { font-size: 12.5px; color: var(--muted); }
+.spark { display: block; margin-top: 6px; }
+/* sections */
+details.sec { background: transparent; }
+details.sec > summary { list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 12px; padding-block: 4px; }
+details.sec > summary::-webkit-details-marker { display: none; }
+details.sec > summary::before { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(-45deg); transition: transform .15s; flex: none; align-self: center; }
+details.sec[open] > summary::before { transform: rotate(45deg); }
+h2 { font-family: var(--font-display); font-size: 24px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+.n { font-family: var(--font-mono); font-size: 12px; color: var(--muted); background: var(--surface-2); padding: 1px 8px; border-radius: 999px; }
+.sub { color: var(--muted); font-size: 13.5px; margin: 0 0 0 auto; }
+.body { padding-top: 12px; }
+h3 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); margin: 18px 0 8px; }
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; padding: 2px 10px; border-radius: 999px; white-space: nowrap; background: var(--info-bg); color: var(--info); }
+.pill.good { background: var(--good-bg); color: var(--good); } .pill.warn { background: var(--warn-bg); color: var(--warn); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); } .pill.mute { background: var(--surface-2); color: var(--muted); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border-radius: 14px; padding: 15px 17px; box-shadow: var(--shadow); min-width: 0; }
+.card h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; line-height: 1.35; }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+.todo { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.todo li { background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); padding: 13px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; align-items: start; min-width: 0; }
+.todo input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; }
+.todo .t { min-width: 0; overflow-wrap: anywhere; }
+.todo .t b { font-weight: 600; } .todo .t small { display: block; color: var(--muted); font-size: 13.5px; }
+.todo li.done .t { opacity: .5; text-decoration: line-through; }
+.feed { list-style: none; margin: 0; padding: 0; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); }
+.feed li { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 11px 16px; border-top: 1px solid var(--line); min-width: 0; }
+.feed li:first-child { border-top: 0; }
+.av { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; background: var(--info-bg); color: var(--info); flex: none; }
+.av.me { background: var(--accent-bg); color: var(--accent); } .av.bot { background: var(--surface-2); color: var(--muted); }
+.feed .t { min-width: 0; overflow-wrap: anywhere; } .feed small { display: block; color: var(--muted); font-size: 12.5px; }
+.feed .ref { font-family: var(--font-mono); font-size: 12.5px; white-space: nowrap; }
+.tbl { background: var(--surface); border-radius: 14px; box-shadow: var(--shadow); overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 16px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 10px 16px; border-top: 1px solid var(--line); vertical-align: middle; }
+tr:first-child td { border-top: 0; }
+td.m { font-family: var(--font-mono); font-size: 13px; white-space: nowrap; } td.t { min-width: 220px; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.col { background: var(--surface); border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow); min-width: 0; }
+.col h3 { margin-top: 0; }
+.col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; font-size: 14px; }
+.col li { overflow-wrap: anywhere; } .col .k { display: block; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.health { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.health .card ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+[data-hidden="true"] { display: none !important; }
+.empty { color: var(--muted); font-size: 14px; padding: 6px 0; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); background: var(--fg); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 13.5px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 30; max-width: 90vw; }
+.toast.on { opacity: 1; }
+.note { color: var(--muted); font-size: 13px; text-align: center; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .bad .dot { animation: none; } details.sec > summary::before { transition: none; } }
+@media (max-width: 640px) { .todo li { grid-template-columns: auto 1fr; } .todo li .pill { grid-column: 2; justify-self: start; } .sub { display: none; } }
+</style>
+
+<!--
+HOW TO FILL THIS TEMPLATE (for the /daily run)
+- Keep <style> and <script> verbatim. Replace every example value in the body with real data; delete example rows that have no data.
+- data-who on .todo li, .feed li, tbody tr and .card: me | bot | other. The filter chips filter by it.
+- data-id on every .todo li: stable key like pr-695 or jira-PROJ-1026, so checked state survives republishes.
+- .vital classes: good | warn | bad | unk. Use unk when a source was not readable; never guess a status.
+- #spark data-vals: merged PR counts for the last 7 days, oldest first, comma separated.
+- Omit a whole <details class="sec"> when it has nothing to show.
+-->
+
+<div class="wrap">
+  <div class="bar" role="toolbar" aria-label="Digest controls">
+    <div class="chips" id="chips">
+      <button class="chip" type="button" data-f="all" aria-pressed="true">Everyone</button>
+      <button class="chip" type="button" data-f="me" aria-pressed="false">Mine</button>
+      <button class="chip" type="button" data-f="bot" aria-pressed="false">Bots</button>
+    </div>
+    <div class="tools">
+      <button class="btn" type="button" id="hideDone" aria-pressed="false">Hide checked</button>
+      <button class="btn" type="button" id="toggleAll">Collapse all</button>
+      <button class="btn" type="button" id="theme">Theme</button>
+      <button class="btn primary" type="button" id="refresh" title="Copies the command that re-runs /daily on your Mac">Refresh</button>
+    </div>
+  </div>
+
+  <header class="mast">
+    <div>
+      <p class="eyebrow" id="eyebrow" data-updated="2026-11-03T09:38:00-08:00">Daily digest · updated 9:38am PT · since Mon 11-02</p>
+      <h1 id="greet">Tuesday, November 3</h1>
+      <p class="verdict">One sentence: what matters most today. Use <b>bold</b> on two or three facts.</p>
+    </div>
+    <div class="vitals" aria-label="Health at a glance">
+      <div class="vital good"><div class="lbl"><i class="dot"></i>Main CI</div><b>Passing</b><span class="sm">Latest run on main succeeded 1:48pm · 0 failed</span></div>
+      <div class="vital good"><div class="lbl"><i class="dot"></i>Backend deploy</div><b>Live</b><span class="sm"><a href="https://github.com/acme/app/actions">Deploy backend</a> succeeded 11-02</span></div>
+      <div class="vital warn"><div class="lbl"><i class="dot"></i>App errors</div><b>2 new</b><span class="sm">PostHog project name · last 24h</span></div>
+      <div class="vital unk"><div class="lbl"><i class="dot"></i>Backend logs</div><b>Not read</b><span class="sm">Say why: source failed or skipped</span></div>
+    </div>
+    <div class="counts">
+      <div class="count"><b>5</b><span>PRs merged</span></div>
+      <div class="count"><b>6</b><span>need me</span></div>
+      <div class="count"><b>30</b><span>open PRs</span></div>
+      <div class="count"><b>0</b><span>failed on main</span></div>
+      <div class="count"><svg class="spark" id="spark" data-vals="1,3,2,4,0,2,5" width="120" height="34" role="img" aria-label="Merged PRs per day, last 7 days"></svg><span>merged, last 7 days</span></div>
+    </div>
+  </header>
+
+  <details class="sec" open id="s-focus">
+    <summary><h2>Today's focus</h2><span class="n">3</span></summary>
+    <div class="body"><div class="cards">
+      <article class="card" data-who="all"><h4>Bold lead phrase</h4><p>One muted line with a <a href="https://github.com/acme/app/pull/1">#1</a> link.</p></article>
+    </div></div>
+  </details>
+
+  <details class="sec" open id="s-needs">
+    <summary><h2>Needs me</h2><span class="n" id="needsN">1</span><span class="sub">Check items off as you go. Saved in this browser.</span></summary>
+    <div class="body"><ul class="todo" id="todo">
+      <li data-id="pr-688" data-who="me"><input type="checkbox" aria-label="Done"><div class="t"><b>Resolve conflicts on <a href="https://github.com/acme/app/pull/688">#688</a></b><small>Merge main in and push. One muted reason line.</small></div><span class="pill bad">conflicts</span></li>
+    </ul></div>
+  </details>
+
+  <details class="sec" open id="s-health">
+    <summary><h2>Health</h2><span class="sub">App, backend and CI. Name the source and project for every card.</span></summary>
+    <div class="body"><div class="health">
+      <article class="card" data-who="all"><h4>App errors · PostHog (project name)</h4><p><span class="pill warn">2 new in 24h</span> <span class="pill mute">7 active</span></p>
+        <ul><li><a href="https://us.posthog.com/project/0/error-tracking">ExceptionName</a>: short message · 14 events · 6 users · first seen 07:12</li></ul></article>
+      <article class="card" data-who="all"><h4>Backend logs · PostHog (service name)</h4><p><span class="pill good">0 errors</span></p><ul><li>Group repeated error lines and show the count each.</li></ul></article>
+      <article class="card" data-who="all"><h4>CI and deploys · GitHub Actions</h4><p><span class="pill good">main green</span></p><ul><li>Deploy backend: success 11-02 1:48pm. Cancelled runs are listed as cancelled, not failed.</li></ul></article>
+    </div></div>
+  </details>
+
+  <details class="sec" open id="s-shipped">
+    <summary><h2>Shipped</h2><span class="n">5</span><span class="sub">Merged since the last digest</span></summary>
+    <div class="body"><ul class="feed">
+      <li data-who="other"><span class="av">C</span><span class="t">PR title<small>Casey · 11-02 17:23</small></span><span class="ref"><a href="https://github.com/acme/app/pull/608">#608</a></span></li>
+    </ul></div>
+  </details>
+
+  <details class="sec" open id="s-flight">
+    <summary><h2>In flight</h2><span class="n">30</span><span class="sub">Open PRs, grouped. Bot drafts collapsed into one row.</span></summary>
+    <div class="body"><div class="tbl"><table>
+      <thead><tr><th>PR</th><th>What</th><th>Who</th><th>State</th></tr></thead>
+      <tbody><tr data-who="me"><td class="m"><a href="https://github.com/acme/app/pull/682">#682</a></td><td class="t">Maestro smoke tests</td><td>Me</td><td><span class="pill warn">review needed</span></td></tr></tbody>
+    </table></div></div>
+  </details>
+
+  <details class="sec" open id="s-jira">
+    <summary><h2>Jira</h2><span class="sub">Moved since the last digest</span></summary>
+    <div class="body"><div class="cols">
+      <div class="col"><h3><span class="pill good">Done</span></h3><ul><li data-who="me"><span class="k"><a href="https://acme.atlassian.net/browse/PROJ-988">PROJ-988</a> · Me</span>Summary</li></ul></div>
+      <div class="col"><h3><span class="pill warn">In progress</span></h3><ul></ul></div>
+      <div class="col"><h3><span class="pill">New</span></h3><ul></ul></div>
+    </div></div>
+  </details>
+
+  <details class="sec" id="s-slack">
+    <summary><h2>Slack</h2><span class="sub">Decisions, incidents, launches</span></summary>
+    <div class="body"><div class="cards"><article class="card" data-who="all"><h4>Channel · topic</h4><p>One line, linked to the message.</p></article></div></div>
+  </details>
+
+  <details class="sec" open id="s-mine">
+    <summary><h2>My work</h2><span class="sub">From /context-manager and the work journal</span></summary>
+    <div class="body"><div class="cols">
+      <div class="col"><h3><span class="pill good">Done</span></h3><ul><li data-who="me">Item</li></ul></div>
+      <div class="col"><h3><span class="pill">Next</span></h3><ul><li data-who="me">Item</li></ul></div>
+    </div></div>
+  </details>
+
+  <details class="sec" id="s-src">
+    <summary><h2>Sources</h2><span class="sub">What was read, skipped or failed</span></summary>
+    <div class="body"><div class="tbl"><table>
+      <tbody><tr><td>GitHub</td><td><span class="pill good">read</span> detail</td></tr></tbody>
+    </table></div></div>
+  </details>
+
+  <p class="note" id="foot">Updated 11-03 9:38am PT · runs locally on weekdays</p>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+  var day = ($('#eyebrow') && $('#eyebrow').getAttribute('data-updated') || '').slice(0, 10) || 'x';
+  function toast(msg) { var t = $('#toast'); t.textContent = msg; t.classList.add('on'); setTimeout(function () { t.classList.remove('on'); }, 2400); }
+
+  // greeting by hour of the update
+  var h = parseInt(($('#eyebrow').getAttribute('data-updated') || '').slice(11, 13), 10);
+  if (!isNaN(h)) { var g = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; var gr = $('#greet'); if (gr && !gr.getAttribute('data-keep')) gr.insertAdjacentHTML('beforebegin', '<p class="eyebrow">' + g + '</p>'); }
+
+  // theme toggle: system -> light -> dark
+  var root = document.documentElement, themeKey = 'daily-theme';
+  var saved = store.get(themeKey); if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+  $('#theme').addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme'), next = cur === 'light' ? 'dark' : cur === 'dark' ? null : 'light';
+    if (next) root.setAttribute('data-theme', next); else root.removeAttribute('data-theme');
+    store.set(themeKey, next || 'system'); toast('Theme: ' + (next || 'system'));
+  });
+
+  // who filter
+  var filter = 'all';
+  function applyFilter() {
+    $$('[data-who]').forEach(function (el) {
+      var w = el.getAttribute('data-who');
+      el.setAttribute('data-hidden', (filter !== 'all' && w !== 'all' && w !== filter) ? 'true' : 'false');
+    });
+    $$('details.sec').forEach(function (s) {
+      var items = $$('[data-who]', s); if (!items.length) return;
+      var any = items.some(function (el) { return el.getAttribute('data-hidden') !== 'true'; });
+      var msg = s.querySelector('.empty');
+      if (!any && !msg) { var p = document.createElement('p'); p.className = 'empty'; p.textContent = 'Nothing here for this filter.'; s.querySelector('.body').appendChild(p); }
+      if (any && msg) msg.remove();
+    });
+  }
+  $('#chips').addEventListener('click', function (e) {
+    var b = e.target.closest('.chip'); if (!b) return;
+    filter = b.getAttribute('data-f');
+    $$('.chip').forEach(function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); });
+    applyFilter();
+  });
+
+  // checkable todos, saved per day
+  function key(li) { return 'daily-done:' + day + ':' + li.getAttribute('data-id'); }
+  function countNeeds() { var open = $$('#todo li').filter(function (li) { return !li.classList.contains('done'); }).length; var n = $('#needsN'); if (n) n.textContent = open + ' open'; }
+  $$('#todo li').forEach(function (li) {
+    var cb = $('input', li), id = li.getAttribute('data-id'); if (!id) return;
+    if (store.get(key(li)) === '1') { cb.checked = true; li.classList.add('done'); }
+    cb.addEventListener('change', function () { li.classList.toggle('done', cb.checked); store.set(key(li), cb.checked ? '1' : '0'); applyHide(); countNeeds(); });
+  });
+  var hide = store.get('daily-hide') === '1';
+  function applyHide() { $$('#todo li.done').forEach(function (li) { li.setAttribute('data-hidden', hide ? 'true' : 'false'); }); $('#hideDone').setAttribute('aria-pressed', hide ? 'true' : 'false'); }
+  $('#hideDone').addEventListener('click', function () { hide = !hide; store.set('daily-hide', hide ? '1' : '0'); applyHide(); });
+  applyHide(); countNeeds();
+
+  // collapse / expand all
+  $('#toggleAll').addEventListener('click', function () {
+    var secs = $$('details.sec'), anyOpen = secs.some(function (s) { return s.open; });
+    secs.forEach(function (s) { s.open = !anyOpen; }); this.textContent = anyOpen ? 'Expand all' : 'Collapse all';
+  });
+
+  // sparkline from data-vals, drawn to scale with the last bar emphasised
+  var sp = $('#spark');
+  if (sp) {
+    var vals = (sp.getAttribute('data-vals') || '').split(',').map(Number).filter(function (v) { return !isNaN(v); });
+    if (vals.length) {
+      var W = 120, H = 34, gap = 4, bw = (W - gap * (vals.length - 1)) / vals.length, max = Math.max.apply(null, vals) || 1, out = '';
+      vals.forEach(function (v, i) {
+        var bh = Math.max(2, (v / max) * (H - 4)), x = i * (bw + gap), last = i === vals.length - 1;
+        out += '<rect x="' + x.toFixed(1) + '" y="' + (H - bh).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="2" fill="var(--spark)" opacity="' + (last ? 1 : .35) + '"><title>' + v + '</title></rect>';
+      });
+      sp.innerHTML = out;
+    }
+  }
+
+  // refresh: the page cannot run commands, so copy the one that does
+  $('#refresh').addEventListener('click', function () {
+    var cmd = 'bash "$RISK0/toolbox/scripts/daily-digest.sh"';
+    var done = function () { toast('Copied. Paste it in a terminal to re-run /daily.'); };
+    var fallback = function () {
+      var ta = document.createElement('textarea'); ta.value = cmd; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { toast('Run: ' + cmd); } ta.remove();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(cmd).then(done, fallback); else fallback();
+  });
+})();
+</script>
