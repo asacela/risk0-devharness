@@ -22,7 +22,7 @@ no-mistakes is the only review-and-PR path in this workspace. It replaces `super
 
 ## 1b. Optional extra passes (before the gate)
 
-- **Risky change → `/thermo-nuclear-review`.** Risky = a database migration, auth or permissions, billing or payments, a public API contract, or a diff well past a normal ticket's size. Say it looks risky and **ask Alec** before running it. Findings are judged like `superpowers:receiving-code-review`; real ones go to `/fix`, then commit on top before the gate. Not risky: skip it, no-mistakes is enough.
+- **Risky change → `/thermo-nuclear-review`.** Risky = a database migration, auth or permissions, billing or payments, a public API contract, anything in the config's `risky` list, or a diff well past a normal ticket's size. Say it looks risky and **ask Alec** before running it. Findings are judged like `superpowers:receiving-code-review`; real ones go to `/fix`, then commit on top before the gate. Not risky: skip it, no-mistakes is enough.
 - **Prose in the diff → `/unslop`.** If the diff adds or edits Markdown docs, READMEs or user-facing copy, run `/unslop` on those lines only. Never on code or generated files.
 
 ## 2. Start or reattach

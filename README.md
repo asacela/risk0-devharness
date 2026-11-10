@@ -5,7 +5,7 @@ My development root: code repos plus a personal toolbox. Clone it anywhere; that
 | Path | What | Notes |
 |------|------|-------|
 | `repositories/` | Main copy of every cloned code repo | the folder is tracked, its contents are ignored; clone new repos here, see [Setup](#setup) |
-| `.claude/skills/` | Workflow commands | `/setup` `/planning` `/implement` `/test` `/fix` `/cr` `/understand` `/steps` `/push` `/log` `/daily` `/up` `/build` `/legend`, see below. Symlinked into `~/.claude/skills/` |
+| `.claude/skills/` | Workflow commands | `/setup` `/planning` `/implement` `/test` `/fix` `/cr` `/understand` `/steps` `/push` `/log` `/daily` `/up` `/setup-worktree` `/build` `/groom` `/legend` `/context-manager`, see below. Symlinked into `~/.claude/skills/` |
 | `toolbox/` | Personal workspace | daily tracker, work journal, learning notes, plans, helper scripts |
 | `worktrees/` | herdr-managed git worktrees | `worktrees/<repo>/<branch-slug>/`, one per feature branch |
 
@@ -62,14 +62,17 @@ Slash commands for my own loop. Each one wires in the best of the installed tool
 | `/implement` | Builds a plan/ticket/task in a herdr worktree, tests where logic needs them, verifies | `/implement PROJ-938` |
 | `/test` | Runs the tests for what changed, adds missing ones, reports with evidence | `/test` · `/test <app>/src/<module>` |
 | `/fix` | Root cause first, failing regression test, fix once | `/fix "Cannot find module 'zod'" in simulate CI` |
-| `/cr` | Code review: my changes, a teammate's PR, or comments on my PR | `/cr` · `/cr 608` |
+| `/cr` | Code review (ponytail review plus `/thermo-nuclear-review`): my changes, a teammate's PR, or comments on my PR | `/cr` · `/cr 608` |
 | `/understand` | Explains code or a system traced through the real code; `save` keeps it in `toolbox/sandbox/learning/` | `/understand order lifecycle save` |
 | `/steps` | Does what an agent can, then lists in plain words the manual steps left for me: what to run, click or send, and what I should see | `/steps test PROJ-740 locally` · `/steps` |
 | `/log` | Adds a bullet to today's entry in `toolbox/journal/work-journal.md`; no args logs this session's outcomes | `/log shipped PR #599` · `/log` |
-| `/daily` | Daily "what's been happening" digest (PRs/MRs, tickets, Slack, my work) published as a private artifact, one living page | `/daily` · `/daily 3` |
+| `/daily` | Daily digest (PRs/MRs, tickets, Slack, CI and error health where connected, my work) as one interactive private artifact, one living page. Runs locally; `toolbox/scripts/daily-digest.sh` is the headless launcher to schedule, and the page's Refresh button copies its command | `/daily` · `/daily 3` |
 | `/up` | Starts dev servers from this one session: named targets, `all`, or inferred from the current task / free text; reports the URLs. Targets come from the repo's `.risk0.json` | `/up` · `/up api web` · `/up all` · `/up the settings page` · `/up api kill-ports` (frees the targets' ports first) |
+| `/setup-worktree` | Makes a worktree of any repo ready to run: finds the repo's own setup script and docs, copies config and installs deps, isolates its DB and ports under per-worktree names, then points to `/up` | `/setup-worktree` · `/setup-worktree <repo>/<branch-slug>` |
 | `/build` | The whole loop in one go, agentically: `/planning` → `/implement` → `/test` (`/fix` on failures) → `/push` → `/review` my PR's comments → `/fix` → `/push` again. Stops only for gate questions (security, data, migrations, billing) and repeated failures; never merges | `/build PROJ-938` · `/build add CSV export to reports` |
+| `/groom` | Re-runs update → test → review on a branch that already exists: merges `main`, `/test` (`/fix` on failures), `/cr` on changes and open PR comments, fixes, repeats until a pass finds nothing (max 3). Pushes only with `push`; never merges | `/groom` · `/groom push` · `/groom 612` |
 | `/legend` | Prints this table | `/legend` |
+| `/context-manager` | Lists what I'm working on per session, grouped by work stream with its stage, and helps move each stream to its next stage; changes nothing without my OK | `/context-manager` · `/context-manager PROJ-740` |
 | `/fix-merge-conflicts` | Resolves merge conflicts non-interactively, then validates build and tests (borrowed from Cursor's team kit) | `/fix-merge-conflicts` |
 | `/verify-this` | Verifies a claim with baseline vs treatment evidence: VERIFIED / NOT VERIFIED / INCONCLUSIVE (Cursor team kit) | `/verify-this the retry fix stops duplicate sends` |
 | `/weekly-review` | Weekly synthesis of my commits by bugfix, tech debt and net-new (Cursor team kit) | `/weekly-review` |

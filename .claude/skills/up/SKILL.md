@@ -25,5 +25,6 @@ Rules:
 - Explicitly named targets that omit something they `need`: check its port; if it isn't up, say so and offer to start it, don't start it unasked. Inferred sets and `all` include it.
 - Ports: when several targets default to the same port, give the extras free ports through the framework's port flag. Check each port with `lsof -i :<port>` first; if something else holds it, say what and ask before killing it (unless `kill-ports` was passed). Never kill another worktree's server unless asked, which `kill-ports` counts as.
 - Setup: in a fresh worktree, run the config's `worktreeSetup` (if set) once from `$ROOT`. If an env file the docs say you create by hand is missing, stop and say which one and where its example lives; don't guess values or ports.
+- Guards: obey every entry of the config's `guards`; if one would be broken, stop and say which.
 - Data: migrations only against a local DB. Never reset or seed a database from here, and never point at a remote or production one (if the env does, stop and say so).
 - After starting, read a few lines of each background output to confirm it's listening, then reply with one table: target, URL, folder. Nothing else.

@@ -15,9 +15,9 @@ Each command skill reads this file first. It decides which installed tool does w
 | Bugs | `superpowers:systematic-debugging` | — | Root cause before fix. |
 | "It's done" | `superpowers:verification-before-completion` | — | Evidence before claims. |
 | Review, push, PR/MR, CI | no-mistakes (the push command) | `requesting-code-review`, `finishing-a-development-branch` | It reviews, tests, lints, opens the PR and babysits CI. |
-| Reviewing code by hand | `ponytail:ponytail-review` | `/code-review` (only to post inline PR comments: `--comment`) | Reads the connected code, plain-English findings. |
+| Reviewing code by hand | `ponytail:ponytail-review`, then `/thermo-nuclear-review` (both run by `/cr`) | `/code-review` (only to post inline PR comments: `--comment`) | Reads the connected code, plain-English findings, then a strict structural pass. |
 | Modelling states and transitions | `/statechart` (manual, asks first) | — | TLA+ model checker with a Mermaid chart; use in `/planning` for lifecycle tickets. |
-| Risky change, extra scrutiny | `/thermo-nuclear-review` (manual, asks first) | — | Harsh structural review before `/push`: migrations, auth, billing, public API contracts, oversized diffs. |
+| Risky change, extra scrutiny | `/thermo-nuclear-review` (always inside `/cr`; before `/push` it asks first) | — | Harsh structural review: migrations, auth, billing, public API contracts, oversized diffs. |
 | Cutting AI tells from prose | `/unslop` | — | Docs, READMEs, user-facing copy, saved learning notes. Prose only, never code. |
 | Feedback on my PR | `superpowers:receiving-code-review` | — | Verify each comment, no blind agreement. |
 | Output shape | tldr format, below | — | `/tldr` is user-only, so the shape is copied here. |
@@ -32,6 +32,12 @@ Every per-repo value comes from `.risk0.json` at the root of the repo's **main c
   "tracker": { "type": "jira", "site": "<site>.atlassian.net", "project": "PROJ" },
   "branch": "feat/{key}-{slug}",
   "worktreeSetup": "bash scripts/setup-worktree.sh",
+  "worktreeDoctor": "toolbox/scripts/worktree-doctor.sh",
+  "worktreeFiles": [{ "from": ".claude/repo-settings.local.json", "to": ".claude/settings.local.json" }],
+  "guards": ["Never run db:reset or db:seed", "Stop if a hosted-database URL is set in the app env"],
+  "risky": ["an internal RPC contract"],
+  "debugSkills": ["<plugin>:investigating-errors", "<plugin>:investigating-logs"],
+  "deployWorkflow": "Deploy",
   "apps": {
     "api": { "dir": "api", "dev": ["npm run db:up", "npm run dev"], "port": 4000, "needs": [],
              "test": "npm test", "lint": "npm run lint", "typecheck": "npm run typecheck" },
@@ -41,10 +47,18 @@ Every per-repo value comes from `.risk0.json` at the root of the repo's **main c
 }
 ```
 
+All fields below `branch` are optional; a missing or `null` one means the repo has none, so skip that step.
+
 `apps.*.dir` is relative to the repo root; `dev` runs in order from it, the last step being the long-running server. `needs` lists apps that must be up first.
 
 - `host.type`: `github` or `gitlab`. `host.repo` is the `<org>/<repo>` path from the origin URL (GitLab subgroups keep every segment).
 - `tracker.type`: `jira` (with `site` and `project`), `github` or `gitlab` (issues in `host.repo`, nothing else needed; optional `"labels": { "inProgress": "<label>", "review": "<label>" }` for boards driven by labels), or `tracker: null` for none.
+- `worktreeDoctor`: a read-only checker script (path relative to `$RISK0`) that `/setup-worktree` runs against a worktree; it may offer `--fix`.
+- `worktreeFiles`: local files (`from` relative to `$RISK0`, `to` relative to the worktree) copied in after `worktreeSetup`, for config a repo gitignores (e.g. per-worktree plugin settings). `mkdir -p` the target folder; never overwrite an existing file; never commit them.
+- `guards`: hard "never" rules in plain words. `/up`, `/setup-worktree` and `/groom` obey them on top of the built-in rules (never reset or seed data, never use a remote or production database), and stop and say so when one would be broken.
+- `risky`: extra triggers that make `/push` and `/groom` ask to run `/thermo-nuclear-review`, added to the built-in list (migrations, auth, billing, oversized diffs).
+- `debugSkills`: skills `/fix` invokes to pull real production errors and logs.
+- `deployWorkflow`: the CI workflow name `/daily` reports as the "Backend deploy" tile; `null` leaves the tile `unk`.
 
 ## Overrides on superpowers (workspace rules win)
 

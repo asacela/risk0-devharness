@@ -9,7 +9,7 @@ argument-hint: "[plan file | PROJ-123 | #42 | task]"
 Read `$RISK0/.claude/skills/WORKFLOW.md` first (who wins, plan location, output shape).
 
 1. Input: `$ARGUMENTS`, else the plan file for the current branch/ticket, else ask. Move the ticket to In Progress (WORKFLOW.md → Ticket status).
-2. Workspace: on `main` or in the main checkout, create a herdr worktree first (WORKFLOW.md → Overrides). Already in the ticket's worktree: stay.
+2. Workspace: on `main` or in the main checkout, create a herdr worktree first (WORKFLOW.md → Overrides). After the worktree setup, copy the config's `worktreeFiles` into it (WORKFLOW.md → Repo config). Already in the ticket's worktree: stay.
 3. Pick the mode:
    - **Plan with several tasks**: `superpowers:subagent-driven-development`. Subagents report in the tldr block.
    - **Small or single task**: do it yourself under ponytail. Use `superpowers:test-driven-development` only when it adds logic.

@@ -90,6 +90,7 @@ A permanent record of what I actually did, used for standups, weekly updates and
 | Script | What it does |
 |---|---|
 | [`env-check.sh`](/toolbox/scripts/env-check.sh) | Names-only view of `.env` files: each variable's name, set/empty, value length and a known non-secret prefix (`phc_`, `postgresql://`...). Never prints a value. **The only way to inspect a `.env` file:** the `~/.claude/scripts/block-env-access.sh` hook blocks every other command that touches one, and allows this script only at its exact path. Usage: `bash $RISK0/toolbox/scripts/env-check.sh <file> [file ...]` (no args: every `.env*` in the current dir), with nothing chained or piped. |
+| [`daily-digest.sh`](/toolbox/scripts/daily-digest.sh) | Runs `/daily` as a background Claude session (`claude --bg`) and republishes the Daily Update artifact. Schedule it with cron or launchd (see its header; on macOS have cron kickstart a launchd job, since cron alone cannot read the keychain `gh`/`glab` need). Set `DAILY_CWD` to a repo's main checkout to give the session that repo's plugins. The artifact's Refresh button copies the manual command. Log: `~/Library/Logs/daily-digest.log`. Usage: `bash $RISK0/toolbox/scripts/daily-digest.sh`. |
 
 Rules:
 - One script per job, with a header comment saying what it does and how to call it. Add every new script to the table above.
