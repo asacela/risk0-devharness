@@ -36,7 +36,7 @@ Every per-repo value comes from `.risk0.json` at the root of the repo's **main c
   "worktreeFiles": [{ "from": ".claude/repo-settings.local.json", "to": ".claude/settings.local.json" }],
   "guards": ["Never run db:reset or db:seed", "Stop if a hosted-database URL is set in the app env"],
   "risky": ["an internal RPC contract"],
-  "debugSkills": ["posthog:investigating-error-issue", "posthog:investigating-logs"],
+  "debugSkills": ["<plugin>:investigating-errors", "<plugin>:investigating-logs"],
   "deployWorkflow": "Deploy",
   "apps": {
     "api": { "dir": "api", "dev": ["npm run db:up", "npm run dev"], "port": 4000, "needs": [],
