@@ -14,7 +14,7 @@ Read `$RISK0/.claude/skills/WORKFLOW.md` first. This skill only sequences other 
 
 1. **Update.** `git fetch origin main`. If the branch is behind, merge `origin/main` into it (a merge commit, never a rebase or force-push). Conflicts go to `/fix-merge-conflicts`. Then refresh whatever the diff made stale: the ticket's plan file in `toolbox/sandbox/plans/` (tick done tasks) and any repo doc the diff touches.
 2. **Test.** `/test` on the branch diff. Failures go to `/fix`, then `/test` again.
-3. **Review.** `/cr` on the changes. If a PR is open, also `/cr <PR#>` for the comments and gate findings still open. Apply `receiving-code-review` to each: fix the valid ones, note the declined ones with a reason. Risky diff (migration, auth, billing, public API contract, very large): add `/thermo-nuclear-review`.
+3. **Review.** `/cr` on the changes. If a PR is open, also `/cr <PR#>` for the comments and gate findings still open. Apply `receiving-code-review` to each: fix the valid ones, note the declined ones with a reason. Risky diff (migration, auth, billing, public API contract, anything in the config's `risky` list, very large): add `/thermo-nuclear-review`.
 4. **Re-test** if step 3 changed any code.
 
 ## Loop
