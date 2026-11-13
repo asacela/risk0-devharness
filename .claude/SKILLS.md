@@ -12,7 +12,7 @@ Why it matters: every model-invocable skill's name and description loads into ea
 | Process | **superpowers** | when a skill matches | Brainstorm → plan → subagents → TDD → debug → verify |
 | Gate | **no-mistakes** | `/push` | Review, test, lint, docs, PR, CI babysitting |
 | Glue | **own commands** | you type them | Ticket → worktree → plan file → journal; all the workspace rules |
-| Extras | **cursor-team-kit** (4 copied) + **pstack** (2 copied) | you type them | `/fix-merge-conflicts`, `/verify-this`, `/weekly-review`, `/thermo-nuclear-review`, `/statechart`, `/unslop` |
+| Extras | **cursor-team-kit** (4 copied) + **pstack** (2 copied) + **janestreet/agent_skills** (1 copied) | you type them | `/socratic-tutor`, `/fix-merge-conflicts`, `/verify-this`, `/weekly-review`, `/thermo-nuclear-review`, `/statechart`, `/unslop` |
 
 Each does one job. Where two tools claim the same job, the winner is in the overlaps table.
 
@@ -20,7 +20,7 @@ Each does one job. Where two tools claim the same job, the winner is in the over
 
 | Source | Skills | Verdict |
 |---|---|---|
-| Own commands (`.claude/skills/`) | 13 + 6 borrowed | **Keep** |
+| Own commands (`.claude/skills/`) | 13 + 7 borrowed | **Keep** |
 | `ponytail` 5.3.1 | 6 | **Keep** (always-on core) |
 | `superpowers` 7.0.0 | 14 | **Keep** |
 | `no-mistakes` (not a plugin) | 1 | **Keep** |
@@ -98,6 +98,7 @@ Cursor-only plugin (no Claude manifest), so skills are copied into `.claude/skil
 | `/setup`, `/understand`, `/steps`, `/log`, `/daily`, `/up`, `/setup-worktree`, `/groom`, `/legend`, `/context-manager` | Support commands | none |
 | `/fix-merge-conflicts`, `/verify-this`, `/weekly-review` | Copied from cursor-team-kit | none |
 | `/thermo-nuclear-review` | Copied from cursor-team-kit; risk gate before `/push` and in `/build` | none |
+| `/socratic-tutor` | Copied from janestreet/agent_skills (MIT, `LICENSE.md` kept in its folder); trigger-phrase driven ("teach me", "quiz me") | none |
 | `/statechart`, `/unslop` | Copied from pstack; `/statechart` in `/planning`, `/unslop` on prose in `/push` and `/understand save` | none |
 
 ## Still open

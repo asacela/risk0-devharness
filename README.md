@@ -79,6 +79,7 @@ Slash commands for my own loop. Each one wires in the best of the installed tool
 | `/statechart` | Models a system's states and transitions in TLA+, checks the rules, draws a Mermaid chart (pstack). Used in `/planning` for lifecycle tickets; asks first, first run installs TLC and Java | `/statechart order lifecycle` |
 | `/thermo-nuclear-review` | Extremely strict structural review (Cursor team kit). Manual extra step before `/push` for risky changes: migrations, auth, billing, public API contracts, oversized diffs | `/thermo-nuclear-review` |
 | `/unslop` | Cuts AI tells from prose (pstack). For docs, READMEs, user-facing copy and saved notes, never code | `/unslop README.md` |
+| `/socratic-tutor` | Strict Socratic tutor: diagnostic, skill map (levels 0-5), one question at a time, spaced review, final assessment (Jane Street, MIT). Only when I ask to be taught or drilled, not for one-off explains | `/socratic-tutor OCaml GADTs` · `teach me Kubernetes networking` |
 | `/push` | no-mistakes gate: review, test, push, PR, CI; drives its gates; `yes` auto-accepts fixes | `/push` · `/push yes` |
 
 ### `/up` targets
