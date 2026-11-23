@@ -24,6 +24,7 @@ Read `$RISK0/.claude/skills/WORKFLOW.md` first (who wins, plan location, output 
      - existing behaviour that must not change (regression rows);
      - data: migrations up on prod-shaped rows, and backfills.
      Below the table, the coverage goal: every new or changed branch is executed by at least one test, measured by `/test` on changed lines. List anything deliberately left untested, with the reason.
+   - **Prod-data decision (§2, "Prod-data check").** Classify the change as heavy data layer, UI-level, or mixed, and put the decision at the top of `## Verification`: `Prod data: use — <tables, filters, row caps, what runs against them>`, or `Prod data: skip — <one-line reason, e.g. UI-only: new screen over the unchanged GET /campaigns>`. Mixed: use it, scoped to the data-layer part. With `use`, the prod-data rows in `## Test plan` have level `prod-data` and name the script, query or endpoint that runs against the copied rows.
    - **Verification task (§2–3):** if the change reads prod data, depends on a third-party payload, touches env/build config or ships to devices, the last task before `/push` runs it on a prod-data copy, staging or an EAS/device build. Name the environment and the command. Mobile tickets also answer the §3 questions. Add a `## Verification` section with the planned checks (environment, command, expected result) and an empty result line for each.
 4. Never write `docs/superpowers/` and never commit the plan. Check every link in the file resolves.
 5. End with the plan file path and offer `/implement`.
