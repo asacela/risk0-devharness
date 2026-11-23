@@ -24,7 +24,7 @@ Read `$RISK0/.claude/skills/WORKFLOW.md` first. This skill only sequences the ot
 
 - `/push`'s always-ask cases: protected-path refusals, "unvalidated work" refusals, any finding touching security, data loss, migrations or billing, and the one-time `no-mistakes init`.
 - An existing merged or closed PR for the branch.
-- Work that would need a destructive step (`db:reset`, force-push, deleting data) or a credential you don't have.
+- Work that would need a destructive step (resetting a database, force-push, deleting data) or a credential you don't have.
 - The same step failing the same way twice: report the verbatim error instead of trying a third variation.
 - Real-shape verification (WORKFLOW.md → Quality bars §2) that can't run from here: stop before `/push`. Don't defer it to after review.
 

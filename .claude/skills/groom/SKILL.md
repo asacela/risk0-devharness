@@ -29,7 +29,7 @@ Run `/push` once after the loop ends clean. Without `push`, stop with everything
 
 - `/push`'s always-ask cases (protected paths, security, data loss, migrations, billing).
 - A merge conflict that is a judgement call about behavior, not a mechanical overlap.
-- A destructive step (`db:reset`, force-push, deleting data) or a credential you don't have.
+- A destructive step (resetting a database, force-push, deleting data) or a credential you don't have.
 - The same step failing the same way twice: report the verbatim error.
 
 ## Rules
