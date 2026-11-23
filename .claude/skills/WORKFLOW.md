@@ -61,7 +61,7 @@ Every per-repo value comes from `.risk0.json` at the root of the repo's **main c
 
 All fields below `branch` are optional; a missing or `null` one means the repo has none, so skip that step.
 
-`apps.*.dir` is relative to the repo root; `dev` runs in order from it, the last step being the long-running server. `needs` lists apps that must be up first.
+`apps.*.dir` is relative to the repo root; `dev` runs in order from it, the last step being the long-running server. `needs` lists apps that must be up first. Optional `coverage`: the command `/test` runs for coverage when the runner's own flag isn't enough (e.g. a separate script).
 
 - `host.type`: `github` or `gitlab`. `host.repo` is the `<org>/<repo>` path from the origin URL (GitLab subgroups keep every segment).
 - `tracker.type`: `jira` (with `site` and `project`), `github` or `gitlab` (issues in `host.repo`, nothing else needed; optional `"labels": { "inProgress": "<label>", "review": "<label>" }` for boards driven by labels), or `tracker: null` for none. Jira only: optional `parentEpic`, the epic that tickets created by a workflow go under (see **Ticket for every change**); without it they are created at the top level. Optional `defaults` for `/create-issue`: `assignee` (`me` or a name), `labels`, `team` (Jira Team field: name plus id), `dueInDays` (`null` = no due date) and `status`; any missing one is left unset.
