@@ -20,7 +20,7 @@ Each does one job. Where two tools claim the same job, the winner is in the over
 
 | Source | Skills | Verdict |
 |---|---|---|
-| Own commands (`.claude/skills/`) | 13 + 7 borrowed | **Keep** |
+| Own commands (`.claude/skills/`) | 14 + 7 borrowed | **Keep** |
 | `ponytail` 5.3.1 | 6 | **Keep** (always-on core) |
 | `superpowers` 7.0.0 | 14 | **Keep** |
 | `no-mistakes` (not a plugin) | 1 | **Keep** |
@@ -90,12 +90,13 @@ Cursor-only plugin (no Claude manifest), so skills are copied into `.claude/skil
 |---|---|---|
 | `/planning` | Idea or ticket → design → plan file | brainstorming, writing-plans |
 | `/implement` | Plan → code in a herdr worktree | subagent-driven-development, TDD |
-| `/test` | Run and add tests | TDD |
+| `/test` | Run and add tests, read-only prod-data check via the repo's DB proxy | TDD |
 | `/fix` | Root-cause a bug, regression test | systematic-debugging |
-| `/cr` | Review own diff, a PR, or PR comments | ponytail-review, thermo-nuclear-review, receiving-code-review |
+| `/cr` | Review own WIP (must/should fixes), or my PR's comments | ponytail-review, thermo-nuclear-review, receiving-code-review |
+| `/cr-on-pr` | `/cr` review on any PR, posts must/should fixes as inline comments | ponytail-review, thermo-nuclear-review |
 | `/push` | Ship through the gate | no-mistakes |
 | `/build` | All of the above end to end | everything |
-| `/setup`, `/understand`, `/steps`, `/log`, `/daily`, `/up`, `/setup-worktree`, `/groom`, `/legend`, `/context-manager` | Support commands | none |
+| `/setup`, `/understand`, `/steps`, `/log`, `/daily`, `/up`, `/setup-worktree`, `/groom`, `/legend`, `/context-manager`, `/create-issue` | Support commands | none |
 | `/fix-merge-conflicts`, `/verify-this`, `/weekly-review` | Copied from cursor-team-kit | none |
 | `/thermo-nuclear-review` | Copied from cursor-team-kit; risk gate before `/push` and in `/build` | none |
 | `/socratic-tutor` | Copied from janestreet/agent_skills (MIT, `LICENSE.md` kept in its folder); trigger-phrase driven ("teach me", "quiz me") | none |

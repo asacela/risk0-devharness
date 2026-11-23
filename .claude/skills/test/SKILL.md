@@ -1,7 +1,7 @@
 ---
 name: test
-description: Run the right tests for what changed, add missing ones for untested logic, and report results with evidence. Use for /test, "run the tests", "add tests for X", "is this covered".
-argument-hint: "[path | feature | 'write' to add tests]"
+description: Run the right tests for what changed, add missing ones for untested logic, check DB-touching changes against a scoped copy of prod data pulled read-only through the repo's database proxy into the local DB, and report results with evidence. Use for /test, "run the tests", "add tests for X", "is this covered", "test against prod data".
+argument-hint: "[path | feature | 'write' to add tests] [noprod]"
 ---
 
 # /test
@@ -11,5 +11,12 @@ Read `$RISK0/.claude/skills/WORKFLOW.md` first (who wins, plan location, output 
 1. Scope: `$ARGUMENTS` if given, else the branch diff against `main` (`git diff main...HEAD` plus uncommitted).
 2. Map changed files to apps by their `dir` and run their `test` commands from the repo config (WORKFLOW.md → Repo config); the repo's `AGENTS.md` says which suites need extra services, e.g. Docker. Run the narrowest set first (changed test files), then the app suite.
 3. Gaps: for changed logic with no test (a branch, parser, money, auth, data writes), write the test with `superpowers:test-driven-development`, so it must fail without the change. Trivial edits need none (ponytail).
-4. Failures: report them verbatim. Don't fix product code here; hand off to `/fix` unless the fix is obvious and one line.
-5. Report per `superpowers:verification-before-completion`: the command, pass/fail counts, failures verbatim, tests added.
+4. **Prod data (Quality bars §2).** Run this when the diff reads or writes database rows whose real shape matters: queries, migrations, backfills, scheduled jobs, parsers of stored JSON. Skip it for UI-only, mobile-only or test-only diffs, when the config has no `prodData`, or with `noprod`, and say which. Unit suites keep their own throwaway DB; this step runs the changed code path itself against real rows.
+   1. **Pick the rows.** List the tables the diff touches plus the parent rows their foreign keys need. Filter to the cases the change cares about (recent rows, the statuses or edge cases in the plan) and cap each table at 500 rows. Select only columns the local schema has. Always leave out secret columns (tokens, password hashes, API keys, OAuth secrets), and stop if the change needs them. State the tables, filters and caps in one line, then go on.
+   2. **Open the proxy**: run `prodData.proxy` in the background on `prodData.port`, or on a free port if that one is taken (e.g. by a worktree DB). Connect with `prodData.connect`, `{port}` filled in; credentials come from the database client's own config files, never from a value in chat or a command. If the proxy or credentials fail (cloud CLI auth, missing client config), report it as blocked with the steps Alec needs (`/steps` style) and don't fall back to seed data.
+   3. **Read-only, always.** `prodData.connect` opens a read-only session; only run the client's copy-out of a `SELECT` (Postgres: `\copy (SELECT …) TO STDOUT`). Never write, migrate, run DDL, or point an app or script at the proxy.
+   4. **Load into this worktree's local DB only**: the one `/setup-worktree` isolated for it, through its container if it runs in one. If the config has `prodData.localCheck`, run it there first and stop unless it returns 0 (it proves the target isn't production). Pipe the copy-out straight into the local client's copy-in, parents first, so no rows touch disk. If ids collide with local rows, copy into a temp table and insert with "skip on conflict". Obey the config's `guards` and the built-in rules (never reset or seed).
+   5. **Test against it.** Run the changed path against the local DB: the backfill or script, the query, or the endpoint through `/up`. For a migration, load the rows into a local DB at `main`'s latest migration (roll back locally with the repo's own down-migration command if needed), then run the branch's migration on top. Compare the result with what the plan expects.
+   6. **Close out.** Stop the proxy. Leave the copied rows in the local DB (it's thrown away with the worktree) unless Alec says to clear them. Never paste personal fields (names, emails, phones, addresses, vehicle or device identifiers) into replies, plans or the journal: report counts, ids and shapes. Record environment, command and result in the plan's `## Verification`.
+5. Failures: report them verbatim. Don't fix product code here; hand off to `/fix` unless the fix is obvious and one line.
+6. Report per `superpowers:verification-before-completion`: the command, pass/fail counts, failures verbatim, tests added, and the prod-data check (tables and row counts copied, what ran, result) or why it was skipped.

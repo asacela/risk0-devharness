@@ -5,7 +5,7 @@ My development root: code repos plus a personal toolbox. Clone it anywhere; that
 | Path | What | Notes |
 |------|------|-------|
 | `repositories/` | Main copy of every cloned code repo | the folder is tracked, its contents are ignored; clone new repos here, see [Setup](#setup) |
-| `.claude/skills/` | Workflow commands | `/setup` `/planning` `/implement` `/test` `/fix` `/cr` `/understand` `/steps` `/push` `/log` `/daily` `/up` `/setup-worktree` `/build` `/groom` `/legend` `/context-manager`, see below. Symlinked into `~/.claude/skills/` |
+| `.claude/skills/` | Workflow commands | `/setup` `/planning` `/implement` `/test` `/fix` `/cr` `/cr-on-pr` `/understand` `/steps` `/push` `/log` `/daily` `/up` `/setup-worktree` `/build` `/groom` `/legend` `/context-manager` `/create-issue`, see below. Symlinked into `~/.claude/skills/` |
 | `toolbox/` | Personal workspace | daily tracker, work journal, learning notes, plans, helper scripts |
 | `worktrees/` | herdr-managed git worktrees | `worktrees/<repo>/<branch-slug>/`, one per feature branch |
 
@@ -32,7 +32,7 @@ herdr is configured to create worktrees here (`[worktrees] directory = "<root>/w
 5. **Connect the integrations** agents use, in Claude Code: the Atlassian MCP (only for repos whose tracker is Jira: tickets, status moves) and Slack (for `/daily`). If one isn't authed, `daily.md` keeps its last data marked `⚠️ stale`.
 6. **Create the journal files** under `toolbox/journal/` (`daily.md`, `work-journal.md`). Their content is git-ignored, so a fresh clone starts without them; the layout and refresh rules are in [`toolbox/AGENTS.md`](toolbox/AGENTS.md).
 7. **Run `/setup <git-url>` per repo.** It clones into `repositories/<name>/`, detects the repo's host (GitHub or GitLab) and repo path, its ticket tracker (Jira, GitHub or GitLab issues), branch naming, worktree setup script and apps (dev/test/lint commands, ports), asks for what it can't detect, and writes `repositories/<name>/.risk0.json`. Every command reads that file for the repo it runs in. It's excluded from the repo's git (`.git/info/exclude`), so it never gets committed. It also offers `no-mistakes init` in that main checkout (never in a worktree; worktrees share its remotes), which adds a `no-mistakes` git remote and a local gate repo for `/push`. Don't develop in the main checkout directly; use worktrees. Re-run `/setup <name>` to update the config.
-8. **Per-repo secrets stay local.** Copy a repo's env template (e.g. `.env.worktree`) by hand. Agents may only look inside a `.env` through `toolbox/scripts/env-check.sh` (names only).
+8. **Per-repo secrets stay local.** `/setup-worktree` writes a worktree's own env values (ports, local database URLs) through `toolbox/scripts/env-set.sh` and copies secrets as files. Agents may only look inside a `.env` through `toolbox/scripts/env-check.sh` and change one through `env-set.sh`, and neither prints a value.
 
 ## Workflow
 
@@ -47,7 +47,7 @@ herdr is configured to create worktrees here (`[worktrees] directory = "<root>/w
 - **`toolbox/journal/work-journal.md`** is a concise day-by-day log of what got done.
 - **`toolbox/sandbox/learning/`** holds primers and notes on things I'm learning.
 - **`toolbox/sandbox/plans/`** holds plans for tickets and personal projects.
-- **`toolbox/scripts/`** holds helper scripts agents run, e.g. `env-check.sh`, a names-only `.env` viewer (the only way the Claude hook lets an agent look inside one).
+- **`toolbox/scripts/`** holds helper scripts agents run, e.g. `env-check.sh`, a names-only `.env` viewer, and `env-set.sh`, which sets values without printing them (the only ways the Claude hook lets an agent look inside or change one).
 
 **Plugin dependencies** are declared in `.claude/settings.json` (`extraKnownMarketplaces` + `enabledPlugins`): ponytail, superpowers, ui-ux-pro-max and claude-security. Claude Code offers to install them when the repo is trusted. no-mistakes is not a plugin and is installed separately. Add new plugin dependencies there. [`.claude/SKILLS.md`](.claude/SKILLS.md) catalogues every installed skill, the overlaps and what to trim.
 
@@ -59,20 +59,22 @@ Slash commands for my own loop. Each one wires in the best of the installed tool
 |---|---|---|
 | `/setup` | Clones a repo into `repositories/` and writes its `.risk0.json` config (GitHub/GitLab, Jira/issues, branch naming, apps and their commands) that every other command reads | `/setup git@github.com:org/repo.git` · `/setup repo` |
 | `/planning` | Idea or ticket → agreed design → step-by-step plan, in `toolbox/sandbox/plans/` (never the repo) | `/planning PROJ-938` · `/planning #42` |
-| `/implement` | Builds a plan/ticket/task in a herdr worktree, tests where logic needs them, verifies | `/implement PROJ-938` |
-| `/test` | Runs the tests for what changed, adds missing ones, reports with evidence | `/test` · `/test <app>/src/<module>` |
+| `/implement` | Builds a plan/ticket/task in a herdr worktree test-first (`superpowers:test-driven-development`: failing tests committed, then code built against them), verifies on real shape (WORKFLOW.md → Quality bars). `solo`: I write the first pass and the agent only reviews | `/implement PROJ-938` · `/implement PROJ-940 solo` |
+| `/test` | Runs the tests for what changed, adds missing ones, and for DB-touching changes copies a scoped, read-only slice of prod rows through the repo's database proxy into the worktree's local DB and runs the changed path on it (`prodData` in `.risk0.json`; `noprod` skips) | `/test` · `/test <app>/src/<module>` · `/test noprod` |
 | `/fix` | Root cause first, failing regression test, fix once | `/fix "Cannot find module 'zod'" in simulate CI` |
-| `/cr` | Code review (ponytail review plus `/thermo-nuclear-review`): my changes, a teammate's PR, or comments on my PR | `/cr` · `/cr 608` |
+| `/cr` | Reviews my own WIP (ponytail review plus `/thermo-nuclear-review`) and lists the must-fix and should-fix findings from both; with my PR's number, addresses its review comments | `/cr` · `/cr <app>/src` · `/cr 612` (my PR) |
+| `/cr-on-pr` | Runs the `/cr` review on any PR and always posts its must-fix and should-fix findings as inline comments (comment-only, never approves or blocks) | `/cr-on-pr 608` |
 | `/understand` | Explains code or a system traced through the real code; `save` keeps it in `toolbox/sandbox/learning/` | `/understand order lifecycle save` |
 | `/steps` | Does what an agent can, then lists in plain words the manual steps left for me: what to run, click or send, and what I should see | `/steps test PROJ-740 locally` · `/steps` |
 | `/log` | Adds a bullet to today's entry in `toolbox/journal/work-journal.md`; no args logs this session's outcomes | `/log shipped PR #599` · `/log` |
 | `/daily` | Daily digest (PRs/MRs, tickets, Slack, CI and error health where connected, my work) as one interactive private artifact, one living page. Runs locally; `toolbox/scripts/daily-digest.sh` is the headless launcher to schedule, and the page's Refresh button copies its command | `/daily` · `/daily 3` |
 | `/up` | Starts dev servers from this one session: named targets, `all`, or inferred from the current task / free text; reports the URLs. Targets come from the repo's `.risk0.json` | `/up` · `/up api web` · `/up all` · `/up the settings page` · `/up api kill-ports` (frees the targets' ports first) |
 | `/setup-worktree` | Makes a worktree of any repo ready to run: finds the repo's own setup script and docs, copies config and installs deps, isolates its DB and ports under per-worktree names, then points to `/up` | `/setup-worktree` · `/setup-worktree <repo>/<branch-slug>` |
-| `/build` | The whole loop in one go, agentically: `/planning` → `/implement` → `/test` (`/fix` on failures) → `/push` → `/review` my PR's comments → `/fix` → `/push` again. Stops only for gate questions (security, data, migrations, billing) and repeated failures; never merges | `/build PROJ-938` · `/build add CSV export to reports` |
+| `/build` | The whole loop in one go, agentically: `/planning` → `/implement` → `/test` (`/fix` on failures) → `/push` → `/cr` my PR's comments → `/fix` → `/push` again. Stops only for gate questions (security, data, migrations, billing) and repeated failures; never merges | `/build PROJ-938` · `/build add CSV export to reports` |
 | `/groom` | Re-runs update → test → review on a branch that already exists: merges `main`, `/test` (`/fix` on failures), `/cr` on changes and open PR comments, fixes, repeats until a pass finds nothing (max 3). Pushes only with `push`; never merges | `/groom` · `/groom push` · `/groom 612` |
 | `/legend` | Prints this table | `/legend` |
 | `/context-manager` | Lists what I'm working on per session, grouped by work stream with its stage, and helps move each stream to its next stage; changes nothing without my OK | `/context-manager` · `/context-manager PROJ-740` |
+| `/create-issue` | Creates one ticket (Jira, or a GitHub/GitLab issue) with assignee, labels, due date, team and status from the repo's `tracker.defaults`; `/planning`, `/implement` and `/push` call it when a change has no ticket | `/create-issue fix duplicate QR scans, due friday` · `/create-issue` |
 | `/fix-merge-conflicts` | Resolves merge conflicts non-interactively, then validates build and tests (borrowed from Cursor's team kit) | `/fix-merge-conflicts` |
 | `/verify-this` | Verifies a claim with baseline vs treatment evidence: VERIFIED / NOT VERIFIED / INCONCLUSIVE (Cursor team kit) | `/verify-this the retry fix stops duplicate sends` |
 | `/weekly-review` | Weekly synthesis of my commits by bugfix, tech debt and net-new (Cursor team kit) | `/weekly-review` |
@@ -88,7 +90,7 @@ Slash commands for my own loop. Each one wires in the best of the installed tool
 
 **Ticket status follows the work automatically** (rules in `.claude/skills/WORKFLOW.md` → Ticket status). Jira: `/planning` or `/implement` → In Progress, `/push` → Waiting for approval plus a PR-link comment, merged PR → Done (on the next `daily.md` refresh). GitHub/GitLab issues: `/push` puts `Closes #n` in the PR/MR so merging closes the issue, plus optional status labels. Only forward, only tickets assigned to me.
 
-Typical loop: `/planning` → `/implement` → `/push`, with `/test`, `/fix`, `/cr`, `/understand` and `/steps` whenever needed, `/log` to journal it. `/plan`, `/debug` and `/review` are Claude Code built-ins, hence `/planning`, `/fix` and `/cr`.
+Typical loop: `/planning` → `/implement` → `/push`, with `/test`, `/fix`, `/cr`, `/cr-on-pr`, `/understand` and `/steps` whenever needed, `/log` to journal it. `/plan`, `/debug` and `/review` are Claude Code built-ins, hence `/planning`, `/fix` and `/cr`.
 
 The skills live in `.claude/skills/` and are symlinked one by one into `~/.claude/skills/` so worktree sessions (separate git roots) see them. A new command needs its own symlink: `ln -s <root>/.claude/skills/<name> ~/.claude/skills/<name>`.
 

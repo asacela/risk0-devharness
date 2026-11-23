@@ -17,7 +17,9 @@ no-mistakes is the only review-and-PR path in this workspace. It replaces `super
   - Open PR: say so, push to it, and leave its title and body alone unless Alec asks. If the gate's PR step would create a new one, stop and ask.
   - Only merged or closed PRs: stop and ask Alec before a new PR is opened.
 - `no-mistakes status`. If it says `repo not initialized`: that adds a `no-mistakes` git remote and a local gate repo, so **ask Alec once**, then run `no-mistakes init` in the main checkout (`$RISK0/repositories/<repo>`, not a worktree; worktrees share its remotes).
+- Ticket: the branch's key (WORKFLOW.md → Ticket for every change). No key and none found: find or create one now. The PR title will be `<KEY>: <ticket summary>`.
 - Uncommitted changes: commit them (repo's commit style, Co-Authored-By trailer). Never commit `.env*` or anything under `toolbox/`.
+- **Quality bars (WORKFLOW.md → Quality bars).** Check two things. (a) The diff adds logic but no test commit of mine comes before it: stop and offer `/test write` first. (b) The change needs real-shape verification but the plan's `## Verification` is empty or says "later": stop and ask Alec to run it or waive it explicitly. Note a waiver in the intent file so it reaches the PR body.
 - Quick local check (`superpowers:verification-before-completion`): lint/typecheck only for the apps the diff touches (`lint`/`typecheck` from the repo config, WORKFLOW.md → Repo config). Skip slow suites, since the gate's Test step runs them. A failure here gets fixed before the run.
 
 ## 1b. Optional extra passes (before the gate)
@@ -27,7 +29,7 @@ no-mistakes is the only review-and-PR path in this workspace. It replaces `super
 
 ## 2. Start or reattach
 
-Write the intent to a file in the scratchpad: what Alec set out to do (ticket key + goal + acceptance criteria), not a description of the diff. Add any intent text from `$ARGUMENTS`.
+Write the intent to a file in the scratchpad: what Alec set out to do (ticket key + goal + acceptance criteria), not a description of the diff. State the PR title there (`PR title: "<KEY>: <ticket summary>"`). Add any intent text from `$ARGUMENTS`.
 
 ```sh
 no-mistakes axi run --intent-file <scratchpad>/intent.md   # Bash timeout 600000
@@ -55,4 +57,4 @@ At each gate, read the findings (`no-mistakes axi logs` for detail) and judge th
 
 ## 5. Report and log
 
-Once the PR is open or CI is ready, reply in tldr form: PR URL, gates passed, findings fixed/declined (with one-line reasons), CI state, anything Alec must decide. Update the ticket for the open PR (WORKFLOW.md → Ticket status; for issue trackers put `Closes #<n>` in the intent so the PR body carries it). Then refresh the PR section of `toolbox/journal/daily.md` and add a `#ship` bullet to `work-journal.md` (`- \`#ship\` <outcome> · PROJ-123 / PR #456`, on GitLab `#42 / !456`).
+Once the PR is open or CI is ready, reply in tldr form: PR URL, gates passed, findings fixed/declined (with one-line reasons), CI state, anything Alec must decide. After every run, not only the one that created the PR, check its title (WORKFLOW.md → Host commands, "PR title") and set it back to `<KEY>: <ticket summary>` if the gate chose another: the gate's PR step rewrites the title and body on reruns. Update the ticket for the open PR (WORKFLOW.md → Ticket status; for issue trackers put `Closes #<n>` in the intent so the PR body carries it). Then refresh the PR section of `toolbox/journal/daily.md` and add a `#ship` bullet to `work-journal.md` (`- \`#ship\` <outcome> · PROJ-123 / PR #456`, on GitLab `#42 / !456`).

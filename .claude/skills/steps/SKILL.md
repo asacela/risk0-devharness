@@ -11,7 +11,7 @@ Read `$RISK0/.claude/skills/WORKFLOW.md` first (who wins, output shape).
 1. Input: `$ARGUMENTS`. If it's empty, use the task currently under way in this session. If you can't tell what the task is, ask one question and stop.
 2. **Do your part first.** Before listing anything, do every step you are allowed to do: run checks, start containers, run migrations, look up values, confirm scripts and files exist. Check the current state (what's already running or set) instead of assuming it. Never hand Alec a step you could have done yourself.
 3. **Only list what's left for Alec.** These are the things you can't or mustn't do:
-   - Editing `.env` files: agents only inspect them with `toolbox/scripts/env-check.sh`.
+   - Putting a secret into a `.env` file. Agents inspect env files with `toolbox/scripts/env-check.sh` and set values they chose (ports, local URLs) with `toolbox/scripts/env-set.sh`, but never handle a secret value.
    - Anything that needs a secret, a login or a browser (OAuth consent, consoles, dashboards).
    - Long-running processes he needs to watch: dev servers and pollers, one terminal each.
    - Acting as a real user: sending an email, tapping through the app.

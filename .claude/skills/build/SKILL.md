@@ -26,10 +26,12 @@ Read `$RISK0/.claude/skills/WORKFLOW.md` first. This skill only sequences the ot
 - An existing merged or closed PR for the branch.
 - Work that would need a destructive step (`db:reset`, force-push, deleting data) or a credential you don't have.
 - The same step failing the same way twice: report the verbatim error instead of trying a third variation.
+- Real-shape verification (WORKFLOW.md → Quality bars §2) that can't run from here: stop before `/push`. Don't defer it to after review.
 
 ## Rules
 
 - Never merge the PR and never post review replies on GitHub/GitLab unasked (`/cr` and `/push` already say so).
+- Every PR gets a ticket: `/planning` and `/implement` find or create it (WORKFLOW.md → Ticket for every change), and `/push` names the PR from it. An idea with no ticket gets one created without asking.
 - Ticket status, `daily.md` and `work-journal.md` are updated by the steps that own them. Don't duplicate.
 - Keep going between steps without narrating. One short status line per finished step is enough.
 
