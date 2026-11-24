@@ -6,7 +6,7 @@ argument-hint: "<title or description> [type, assignee, labels, due, team, statu
 
 # /create-issue
 
-Read `$RISK0/.claude/skills/WORKFLOW.md` first (Repo config → `tracker`, Tickets, Ticket status). This skill only creates. Searching for an existing ticket is the caller's job (WORKFLOW.md → Ticket for every change); when you're invoked directly, don't search, just create.
+Read `$RISK0/.claude/skills/WORKFLOW.md` first (Repo config → `tracker`, Tickets, Ticket status). This skill only creates. Finding the topic's existing ticket is the caller's job (WORKFLOW.md → Ticket for every change: one ticket per topic); a caller reaches here only when none covers the topic. Invoked directly: run one quick topic search first; if an open ticket of mine already covers it, say its key and ask before creating a duplicate.
 
 `tracker: null` (or no config): say there is no tracker and stop.
 

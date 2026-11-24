@@ -88,10 +88,10 @@ Cursor-only plugin (no Claude manifest), so skills are copied into `.claude/skil
 
 | Command | Job | Leans on |
 |---|---|---|
-| `/planning` | Idea or ticket → design → plan file | brainstorming, writing-plans |
+| `/planning` | Idea or ticket → design → plan file | brainstorming, writing-plans, dispatching-parallel-agents (several code areas) |
 | `/implement` | Plan → code in a herdr worktree | subagent-driven-development, TDD |
-| `/test` | Run and add tests, read-only prod-data check via the repo's DB proxy | TDD |
-| `/fix` | Root-cause a bug, regression test | systematic-debugging |
+| `/test` | Run and add tests, read-only prod-data check via the repo's DB proxy | TDD, dispatching-parallel-agents (gaps in several modules) |
+| `/fix` | Root-cause a bug, regression test | systematic-debugging, dispatching-parallel-agents (several unrelated failures) |
 | `/cr` | Review own WIP (must/should fixes), or my PR's comments | ponytail-review, thermo-nuclear-review, receiving-code-review |
 | `/cr-on-pr` | `/cr` review on any PR, posts must/should fixes as inline comments | ponytail-review, thermo-nuclear-review |
 | `/push` | Ship through the gate | no-mistakes |

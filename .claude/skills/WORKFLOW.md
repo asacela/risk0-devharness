@@ -12,6 +12,7 @@ Each command skill reads this file first. It decides which installed tool does w
 | Worktrees | `herdr worktree create` | `superpowers:using-git-worktrees` | Workspace rule (root `AGENTS.md`). |
 | Running a plan | `superpowers:subagent-driven-development` | `executing-plans` (only if Alec asks for inline) | Fresh context per task, review between tasks. |
 | Logic-bearing code | `superpowers:test-driven-development` (the default in `/implement`), test committed first (Quality bars §1) | — | Trivial edits need no test (ponytail). |
+| Speed on independent work | `superpowers:dispatching-parallel-agents`: one agent per independent piece, sent together (`/fix` with several unrelated failures, `/test` writing tests for several modules, `/planning` reading several code areas) | `subagent-driven-development` for this: it runs tasks one at a time, by design | Only when the pieces share no files or state; each agent gets a narrow brief and reports in the tldr block. Check its claims before acting on them. |
 | Bugs | `superpowers:systematic-debugging` | — | Root cause before fix. |
 | "It's done" | `superpowers:verification-before-completion` | — | Evidence before claims. |
 | Review, push, PR/MR, CI | no-mistakes (the push command) | `requesting-code-review`, `finishing-a-development-branch` | It reviews, tests, lints, opens the PR and babysits CI. |
@@ -117,12 +118,17 @@ Acceptance criteria (Jira field or the issue body) are the spec. Plan files are 
 
 ## Ticket for every change
 
-Every change that ends in a PR has a ticket, and the branch and PR are named from it. `tracker: null`: skip this section. `/planning` and `/implement` run it **before the worktree and branch are created** (the branch name needs the key); `/push` runs it again as a guard.
+Every change that ends in a PR has a ticket, and the branch and PR are named from it. **One ticket per topic, not per PR:** follow-ups, fixes, review rounds and extra PRs on the same feature, bug or area reuse that topic's ticket. Creating a ticket is the last resort. `tracker: null`: skip this section. `/planning` and `/implement` run it **before the worktree and branch are created** (the branch name needs the key); `/push` runs it again as a guard.
 
 1. **Find it.** A key from the input, the plan file name or the branch (WORKFLOW.md → Tickets) is the ticket: fetch it. Its summary and acceptance criteria are the spec.
-2. **No key: look for an existing one.** Search the tracker for open work with the same goal (Jira: JQL `project = <project> AND statusCategory != Done AND text ~ "<2-3 keywords>"`, mine first; issues: `gh issue list --search` / `glab issue list --search`). One clear match: use it and say which. Nothing, or only loose matches: create one. Never ask Alec to pick between loose matches; create.
-3. **Create it** with `/create-issue`: pass the title (a short imperative summary), the goal and acceptance criteria from the plan or intent as the description, and the type (`Bug` for a fix, `Story` for a user-facing feature, else `Task`). It applies the config's `parentEpic` and `defaults` (assignee, labels, due date, team, status). Say the new key in the reply (`created PROJ-123 under PROJ-1`). Then the ticket status rules below apply as usual.
-4. **Name from it.** Branch: the config `branch` pattern with the key and a slug of the summary. PR title: `<KEY>: <ticket summary>` (`<summary> (#123)` for issues), the ticket's own summary, never an invented one. The key stays in the PR title even if the branch predates the ticket; don't rename a branch that has a PR.
+2. **No key: find the topic's ticket.** In order, stop at the first hit:
+   - A ticket already used in this session or on a related branch/plan file (the follow-up builds on it).
+   - The tracker, searched by **topic** (the feature, bug or area), not by this change's exact wording: a few keyword variants (Jira: JQL `project = <project> AND statusCategory != Done AND (summary ~ "<kw>" OR text ~ "<kw>")`, mine first, plus tickets of mine updated in the last 14 days; issues: `gh issue list --search` / `glab issue list --search`).
+   - A ticket of mine **Done in the last 14 days** on the same topic, when this change finishes or fixes that work: use it as the reference, but don't reopen it (Ticket status → Guards); a new ticket is fine here only if the work is genuinely new.
+
+   One match on the same topic: use it and say which. Several: take the one most recently updated by me and say which. Create only when nothing covers the topic.
+3. **Create it** (only if step 2 found nothing) with `/create-issue`: pass the title (a short imperative summary), the goal and acceptance criteria from the plan or intent as the description, and the type (`Bug` for a fix, `Story` for a user-facing feature, else `Task`). It applies the config's `parentEpic` and `defaults` (assignee, labels, due date, team, status). Say the new key in the reply (`created PROJ-123 under PROJ-1`). Then the ticket status rules below apply as usual.
+4. **Name from it.** Branch: the config `branch` pattern with the key and a slug of the summary. PR title: `<KEY>: <ticket summary>` (`<summary> (#123)` for issues), the ticket's own summary, never an invented one. The key stays in the PR title even if the branch predates the ticket; don't rename a branch that has a PR. A second PR on the same ticket gets its own slug (`feat/proj-123-<other-slug>`).
 
 ## Ticket status
 

@@ -31,7 +31,7 @@ Read `$RISK0/.claude/skills/WORKFLOW.md` first. This skill only sequences the ot
 ## Rules
 
 - Never merge the PR and never post review replies on GitHub/GitLab unasked (`/cr` and `/push` already say so).
-- Every PR gets a ticket: `/planning` and `/implement` find or create it (WORKFLOW.md → Ticket for every change), and `/push` names the PR from it. An idea with no ticket gets one created without asking.
+- Every PR gets a ticket: `/planning` and `/implement` find or create it (WORKFLOW.md → Ticket for every change), and `/push` names the PR from it. An idea with no ticket reuses its topic's ticket, else gets one created without asking (one ticket per topic).
 - Ticket status, `daily.md` and `work-journal.md` are updated by the steps that own them. Don't duplicate.
 - Keep going between steps without narrating. One short status line per finished step is enough.
 
