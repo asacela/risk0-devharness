@@ -23,14 +23,51 @@ Read `$RISK0/.claude/skills/WORKFLOW.md` first (who wins, plan location, output 
    - the changed queries, with `EXPLAIN ANALYZE` or the equivalent at real volumes;
    - the endpoints or jobs, through `/up` and real requests.
 
-   Check that the outputs match the ticket or plan and that totals and invariants hold, and look for errors, slow queries and unhandled values in the logs. Mobile and UI paths: run whatever can be run here, and list the rest as not driven, with the reason.
+   Check that the outputs match the ticket or plan and that totals and invariants hold, and look for errors, slow queries and unhandled values in the logs.
+   - **Nothing leaves the machine.** Before driving, switch outbound side effects to record-only or off: push, SMS, email, analytics, chat webhooks, payments. Never copy push tokens or other delivery credentials. If one can't be stubbed, don't drive that path; list it under Not tested.
+   - **Shape the data locally when real data can't reach the path.** For example, move dates forward when every real booking is in the past, or rebook members into a mix of states. Change only the local copy, and record each change and why in Setup.
+   - **Time-based jobs:** replay them over a simulated window at their real cadence, inside a transaction you roll back at the end.
+   - **UI:** drive it with what's available, for example the simulator through Maestro or `.sim` flows, and web apps through Playwright with a local-only session. Check the resulting DB rows, not only the screen.
+   - **Races:** fire the same request twice in parallel.
+   - **Earlier comments:** try to reproduce each finding already raised on the PR, and add a Results row for each.
+   - Anything that can't run here (another platform, a real device, a real delivery, third-party sign-in) goes under Not tested.
 6. **Findings.** Keep a finding only if running the code showed it and it isn't in the baseline. Reproduce each one twice (`superpowers:systematic-debugging` for the cause, no fixes here). Then:
-   - Grade it must / should as `/cr` → **Review** step 2 does.
+   - Grade it must / should as `/cr` → **Review** step 2 does. Must → **Blocking**, should → **Not blocking**. An earlier comment that didn't reproduce goes under Not blocking, downgraded, with the Results row that tried it.
    - Attach its evidence: the command, a trimmed output or error excerpt, and the row count or timing behind it.
    - **Evidence goes on a shared page, so never include personal fields** (names, emails, phones, addresses, vehicle or device identifiers), secrets, or row contents. Use counts, shapes, column names, enum values, timings and errors with values masked.
-7. **Post one review** as in `/cr-on-pr` step 4, pinned to the tested SHA, with findings inline where their lines are in the diff, prefixed `**Must fix (test-drive):**` / `**Should fix (test-drive):**` with the evidence under each. Post it even when nothing new turned up, because the evidence is the point. The body:
-   - `Test-drive: N new must · N new should` (or `Test-drive: no new findings`);
-   - the environment, the prod-data decision and reason (tables and row counts copied, never contents), and the commands run with their pass/fail result;
-   - the suite counts and coverage of the changed files;
-   - what wasn't driven and why.
+7. **Post one review** as in `/cr-on-pr` step 4, pinned to the tested SHA. Its body is the report in **Evidence post format** below. Each Blocking or Not blocking finding whose lines are in the diff also gets a short inline comment, `**Must fix (test-drive):**` / `**Should fix (test-drive):**`, with one line of evidence pointing to the report. Post even when nothing new turned up, because the evidence is the point.
 8. **Close out.** Stop the proxy and any servers you started. If it's my PR with a plan file, add the run to `## Verification`. Reply in tldr form with must-fixes above the divider, the review's URL, and the next step: on my PR, offer `/fix` for each finding; on a teammate's, nothing more.
+
+## Evidence post format
+
+Plain prose, first person, past tense, short sentences, no filler. Concrete numbers, states and texts as observed, never "works as expected". Sections in this order; leave out a section only if it would be empty, except Not tested, which always appears.
+
+```
+Local run on real <dataset scope> data, at <short SHA>
+I ran every flow this PR touches against a read-only copy of <dataset> from prod, then <how it was driven, one clause>.
+
+Setup
+- Data: a read-only copy of <entities with counts>, loaded into a local worktree database. <migrations: ran on top without errors | what failed>.
+- <Data shaping> (local only): <what real data couldn't reach, what was changed, how many rows, into which mix of states>.
+- Nothing sent: <side effects recorded or off>. No <tokens or credentials> were copied.
+- How I drove it: <devices and builds, tools (Maestro, Playwright, HTTP, in-process calls), sessions>.
+
+Results
+| # | Flow | How | Result |
+|---|---|---|---|
+| 1 | <flow name> | <what ran: job replay window, simulator steps, API calls, parallel requests> | ✅ / ❌ / ⚠️ <observed outcome: UI text, DB rows and statuses, response codes, counts, timings> |
+| 1b | <variant of 1, e.g. the forbidden case> | … | … |
+
+Blocking
+<One-sentence bug statement> (<file:line>, <"on my earlier comment" if it was raised>). <How it was reproduced on this data>. <What it causes>. <Impact counted on the real data, e.g. "23 of the 42 members ...">. Fix: <concrete change>.
+
+Not blocking, seen while running
+<One-sentence statement>. <What was seen>. <When it bites in production, with real numbers and dates if it depends on timing>. <Suggestion or the two options>.
+<An earlier comment that didn't reproduce (row N), and how to treat it now.>
+
+Not tested: <platforms, real devices, real deliveries, third-party sign-in, anything listed in step 5>.
+```
+
+- Name things the way the product does (dataset, campaign, region). Never names, contact details or other personal fields of users: refer to "a real member whose only earlier bookings were ...".
+- Every ✅ says what was checked, and every ❌ or ⚠️ has a matching entry under Blocking or Not blocking.
+- Impact counts come from the copied data and are labelled as such.
