@@ -94,6 +94,7 @@ Cursor-only plugin (no Claude manifest), so skills are copied into `.claude/skil
 | `/fix` | Root-cause a bug, regression test | systematic-debugging, dispatching-parallel-agents (several unrelated failures) |
 | `/cr` | Review own WIP (must/should fixes), or my PR's comments | ponytail-review, thermo-nuclear-review, receiving-code-review |
 | `/cr-on-pr` | `/cr` review on any PR, posts must/should fixes as inline comments | ponytail-review, thermo-nuclear-review |
+| `/test-drive` | Runs a PR's code on prod-shaped local data, posts evidence and findings `/cr` missed | systematic-debugging, verification-before-completion |
 | `/push` | Ship through the gate | no-mistakes |
 | `/build` | All of the above end to end | everything |
 | `/setup`, `/understand`, `/steps`, `/log`, `/daily`, `/up`, `/setup-worktree`, `/groom`, `/legend`, `/context-manager`, `/create-issue` | Support commands | none |

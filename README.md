@@ -5,7 +5,7 @@ My development root: code repos plus a personal toolbox. Clone it anywhere; that
 | Path | What | Notes |
 |------|------|-------|
 | `repositories/` | Main copy of every cloned code repo | the folder is tracked, its contents are ignored; clone new repos here, see [Setup](#setup) |
-| `.claude/skills/` | Workflow commands | `/setup` `/planning` `/implement` `/test` `/fix` `/cr` `/cr-on-pr` `/understand` `/steps` `/push` `/log` `/daily` `/up` `/setup-worktree` `/build` `/groom` `/legend` `/context-manager` `/create-issue`, see below. Symlinked into `~/.claude/skills/` |
+| `.claude/skills/` | Workflow commands | `/setup` `/planning` `/implement` `/test` `/fix` `/cr` `/cr-on-pr` `/test-drive` `/understand` `/steps` `/push` `/log` `/daily` `/up` `/setup-worktree` `/build` `/groom` `/legend` `/context-manager` `/create-issue`, see below. Symlinked into `~/.claude/skills/` |
 | `toolbox/` | Personal workspace | daily tracker, work journal, learning notes, plans, helper scripts |
 | `worktrees/` | herdr-managed git worktrees | `worktrees/<repo>/<branch-slug>/`, one per feature branch |
 
@@ -64,6 +64,7 @@ Slash commands for my own loop. Each one wires in the best of the installed tool
 | `/fix` | Root cause first, failing regression test, fix once | `/fix "Cannot find module 'zod'" in simulate CI` |
 | `/cr` | Reviews my own WIP (ponytail review plus `/thermo-nuclear-review`) and lists the must-fix and should-fix findings from both; with my PR's number, addresses its review comments | `/cr` · `/cr <app>/src` · `/cr 612` (my PR) |
 | `/cr-on-pr` | Runs the `/cr` review on any PR and always posts its must-fix and should-fix findings as inline comments (comment-only, never approves or blocks) | `/cr-on-pr 608` |
+| `/test-drive` | Runs a PR's changed code for real (suites, coverage, migrations, scripts, queries, endpoints), on a read-only copy of prod data in the local DB when the change is data-heavy, finds bugs the static `/cr` review missed, and always posts the evidence and new findings on the PR (no personal data) | `/test-drive 608` · `/test-drive` |
 | `/understand` | Explains code or a system traced through the real code; `save` keeps it in `toolbox/sandbox/learning/` | `/understand order lifecycle save` |
 | `/steps` | Does what an agent can, then lists in plain words the manual steps left for me: what to run, click or send, and what I should see | `/steps test PROJ-740 locally` · `/steps` |
 | `/log` | Adds a bullet to today's entry in `toolbox/journal/work-journal.md`; no args logs this session's outcomes | `/log shipped PR #599` · `/log` |
@@ -90,7 +91,7 @@ Slash commands for my own loop. Each one wires in the best of the installed tool
 
 **Ticket status follows the work automatically** (rules in `.claude/skills/WORKFLOW.md` → Ticket status). Jira: `/planning` or `/implement` → In Progress, `/push` → Waiting for approval plus a PR-link comment, merged PR → Done (on the next `daily.md` refresh). GitHub/GitLab issues: `/push` puts `Closes #n` in the PR/MR so merging closes the issue, plus optional status labels. Only forward, only tickets assigned to me.
 
-Typical loop: `/planning` → `/implement` → `/push`, with `/test`, `/fix`, `/cr`, `/cr-on-pr`, `/understand` and `/steps` whenever needed, `/log` to journal it. `/plan`, `/debug` and `/review` are Claude Code built-ins, hence `/planning`, `/fix` and `/cr`.
+Typical loop: `/planning` → `/implement` → `/push`, with `/test`, `/fix`, `/cr`, `/cr-on-pr`, `/test-drive`, `/understand` and `/steps` whenever needed, `/log` to journal it. `/plan`, `/debug` and `/review` are Claude Code built-ins, hence `/planning`, `/fix` and `/cr`.
 
 The skills live in `.claude/skills/` and are symlinked one by one into `~/.claude/skills/` so worktree sessions (separate git roots) see them. A new command needs its own symlink: `ln -s <root>/.claude/skills/<name> ~/.claude/skills/<name>`.
 
